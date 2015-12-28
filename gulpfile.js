@@ -4,6 +4,7 @@ var $ = require('gulp-load-plugins')();
 var runSequence = require('run-sequence');
 var browserSync = require('browser-sync');//http://www.browsersync.io/docs/gulp/
 var reload = browserSync.reload;
+var webpack = require("webpack");
 require('date-utils');
 
 //build version:
@@ -62,7 +63,27 @@ gulp.task('manifest', function (cb) {
         });
     });
 });
-
+gulp.task("webpack", function(callback) {
+  // run webpack
+  webpack({
+    entry: "./packall.js",
+    output: {
+      path: __dirname + "/src",
+      filename: "App.js"
+    },
+    module: {
+      loaders: [
+        { test: /\.css$/, loader: "style!css?-url" }
+      ]
+    }
+  }, function(err, stats) {
+    if(err) throw new $.util.PluginError("webpack", err);
+    $.util.log("[webpack]", stats.toString({
+      // output options
+    }));
+    callback();
+  });
+});
 //browser-sync serve
 gulp.task('serve', function () {
   browserSync({
